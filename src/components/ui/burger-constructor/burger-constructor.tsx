@@ -16,6 +16,7 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
   price,
   orderModalData,
   onOrderClick,
+
   closeOrderModal
 }) => (
   <section className={styles.burger_constructor}>
