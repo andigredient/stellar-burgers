@@ -37,6 +37,9 @@ const feedSlice = createSlice({
         state.total = action.payload.total;
         state.totalToday = action.payload.totalToday;
         state.isFeedsLoading = false;
+      })
+      .addCase(getFeeds.rejected, (state) => {
+        state.isFeedsLoading = false;
       });
   }
 });

@@ -25,6 +25,7 @@ import { getIngredientsApi } from '../../utils/burger-api';
 import { useEffect } from 'react';
 //import { useDispatch } from 'react-redux';
 import { useDispatch, useSelector } from '../../services/store';
+import { CenteringContainer } from '../centerComponents';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -52,7 +53,15 @@ const App = () => {
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
         <Route path='/feed/:number' element={<OrderInfo />} />
-        <Route path='/ingredients/:id' element={<IngredientDetails />} />
+
+        <Route
+          path='/ingredients/:id'
+          element={
+            <CenteringContainer title='Детали ингредиента'>
+              <IngredientDetails />
+            </CenteringContainer>
+          }
+        />
 
         <Route
           path='/login'

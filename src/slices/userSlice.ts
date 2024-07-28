@@ -15,11 +15,13 @@ import { TUser } from '@utils-types';
 type TUserState = {
   isAuthChecked: boolean;
   user: TUser | null;
+  isLoading: boolean;
 };
 
 const initialState: TUserState = {
   isAuthChecked: false,
-  user: null
+  user: null,
+  isLoading: false
 };
 
 export const userSlice = createSlice({
@@ -39,17 +41,44 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.user = action.payload;
+      })
+      .addCase(registerUser.rejected, (state) => {
+        state.isLoading = false;
+      })
+
+      .addCase(loginUser.pending, (state) => {
+        state.isLoading = true;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload;
       })
+      .addCase(loginUser.rejected, (state) => {
+        state.isLoading = false;
+      })
+
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
       })
+      .addCase(updateUser.rejected, (state) => {
+        state.isLoading = false;
+      })
+
+      .addCase(logout.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+      })
+      .addCase(logout.rejected, (state) => {
+        state.isLoading = false;
       });
   }
 });

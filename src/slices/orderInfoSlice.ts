@@ -30,6 +30,9 @@ const orderSlice = createSlice({
       })
       .addCase(getOrderByNumber.fulfilled, (state, action) => {
         state.order = action.payload.orders[0] ?? null;
+      })
+      .addCase(getOrderByNumber.rejected, (state) => {
+        state.order = null;
       });
   }
 });

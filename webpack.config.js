@@ -71,6 +71,7 @@ module.exports = {
       '.jpg'
     ],
     alias: {
+      "qwe": "npm run format && npm run lint:fix && npm run start",
       '@pages': path.resolve(__dirname, './src/pages'),
       '@components': path.resolve(__dirname, './src/components'),
       '@ui': path.resolve(__dirname, './src/components/ui'),

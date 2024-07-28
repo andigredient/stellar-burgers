@@ -4,10 +4,12 @@ import { TOrder } from '@utils-types';
 
 type TOrderState = {
   order: TOrder[];
+  isLoading: boolean;
 };
 
 const initialState: TOrderState = {
-  order: []
+  order: [],
+  isLoading: false
 };
 
 export const getOrders = createAsyncThunk('orders/getOrders', async () =>
@@ -22,9 +24,16 @@ const ordersSlice = createSlice({
     getOrdersSelector: (state) => state.order
   },
   extraReducers: (builder) => {
-    builder.addCase(getOrders.fulfilled, (state, action) => {
-      state.order = action.payload;
-    });
+    builder
+      .addCase(getOrders.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getOrders.fulfilled, (state, action) => {
+        state.order = action.payload;
+      })
+      .addCase(getOrders.rejected, (state, action) => {
+        state.isLoading = false;
+      });
   }
 });
 

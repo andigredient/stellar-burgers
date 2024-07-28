@@ -1,5 +1,5 @@
 import { FC, useMemo, useState, useEffect } from 'react';
-import { TConstructorIngredient } from '@utils-types';
+import { TConstructorIngredient, TOrder } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import { useSelector, useDispatch } from '../../services/store';
 import { useNavigate } from 'react-router-dom';
@@ -18,12 +18,13 @@ export const BurgerConstructor: FC = () => {
   /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
   const constructorItems = useSelector(getConstructorSelector);
   const orderRequest = useSelector(getRequestSelector);
-  const orderModalData = useSelector(getBurgerSelector).order;
   const user = useSelector(userDataSelector);
-  const [modalState, setModalState] = useState(true);
+  const [orderModalData, setOrderModalState] = useState<TOrder | null>(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {}, [orderRequest || orderModalData]);
 
   const onOrderClick = () => {
     if (!constructorItems.bun || orderRequest) return;
@@ -35,11 +36,18 @@ export const BurgerConstructor: FC = () => {
       constructorItems.bun._id,
       ...constructorItems.ingredients.map((i) => i._id)
     ];
-    dispatch(orderBurger(orderItems));
-    dispatch(clearConstructor());
+    dispatch(orderBurger(orderItems))
+      .unwrap()
+      .then((res) => {
+        setOrderModalState(res.order);
+        dispatch(clearConstructor());
+      })
+      .catch((res) => {
+        console.log(res);
+      });
   };
   const closeOrderModal = () => {
-    setModalState(false);
+    setOrderModalState(null);
   };
 
   const price = useMemo(
@@ -52,10 +60,6 @@ export const BurgerConstructor: FC = () => {
     [constructorItems]
   );
 
-  useEffect(() => {
-    setModalState(true);
-  }, [orderRequest]);
-
   return (
     <BurgerConstructorUI
       price={price}
@@ -63,7 +67,6 @@ export const BurgerConstructor: FC = () => {
       constructorItems={constructorItems}
       orderModalData={orderModalData}
       onOrderClick={onOrderClick}
-      modalState={modalState}
       closeOrderModal={closeOrderModal}
     />
   );

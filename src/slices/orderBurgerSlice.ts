@@ -37,6 +37,9 @@ const orderBurgerSlice = createSlice({
         state.order = action.payload.order;
         state.name = action.payload.name;
         state.orderRequest = false;
+      })
+      .addCase(orderBurger.rejected, (state) => {
+        state.orderRequest = false;
       });
   }
 });
