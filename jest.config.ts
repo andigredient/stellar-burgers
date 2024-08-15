@@ -56,7 +56,7 @@ const config: Config = {
   // fakeTimers: {
   //   "enableGlobally": false
   // },
-
+  preset: 'ts-jest'
   // Force coverage collection from ignored files using an array of glob patterns
   // forceCoverageMatch: [],
 
