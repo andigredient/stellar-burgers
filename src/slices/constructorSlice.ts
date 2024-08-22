@@ -6,7 +6,7 @@ type TConstructorState = {
   ingredients: TConstructorIngredient[];
 };
 
-const initialState: TConstructorState = {
+export const initialState: TConstructorState = {
   bun: null,
   ingredients: []
 };
@@ -33,13 +33,13 @@ const constructorSlice = createSlice({
         return { payload: { ...ingredient, id } };
       }
     },
-    removeIngredient: (
-      state,
-      action: PayloadAction<TConstructorIngredient>
-    ) => {
-      state.ingredients = state.ingredients.filter(
-        (i) => i.id !== action.payload.id
+    removeIngredient: (state, action) => {
+      const indexToRemove = state.ingredients.findIndex(
+        (i) => i._id === action.payload
       );
+      if (indexToRemove !== -1) {
+        state.ingredients.splice(indexToRemove, 1);
+      }
     },
     clearConstructor: (state) => {
       state.bun = null;
@@ -52,6 +52,9 @@ const constructorSlice = createSlice({
 });
 
 export default constructorSlice.reducer;
+
+export const constructorReducer = constructorSlice.reducer;
+
 export const { getConstructorSelector } = constructorSlice.selectors;
 export const { setBun, addIngredient, removeIngredient, clearConstructor } =
   constructorSlice.actions;

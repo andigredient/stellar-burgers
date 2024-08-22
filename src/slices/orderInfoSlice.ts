@@ -1,6 +1,6 @@
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getOrderByNumberApi } from '../utils/burger-api';
 import { TOrder } from '../utils/types';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 type TOrderInfoState = {
   order: TOrder | null;
@@ -19,10 +19,6 @@ const orderSlice = createSlice({
   name: 'orderInfo',
   initialState,
   reducers: {},
-  selectors: {
-    getOrderSelector: (state) => state.order,
-    getOrderNumberSelector: (state) => state.order?.number
-  },
   extraReducers: (builder) => {
     builder
       .addCase(getOrderByNumber.pending, (state) => {
@@ -37,6 +33,10 @@ const orderSlice = createSlice({
   }
 });
 
+export const selectOrder = (state: { orderInfo: TOrderInfoState }) =>
+  state.orderInfo.order;
+
+export const selectOrderNumber = (state: { orderInfo: TOrderInfoState }) =>
+  state.orderInfo.order?.number;
+
 export default orderSlice.reducer;
-export const { getOrderSelector, getOrderNumberSelector } =
-  orderSlice.selectors;

@@ -1,77 +1,92 @@
-import feedSliceReducer from './feedSlice';
+import { TOrder } from '@utils-types';
+import feedSliceReducer, {
+  feedsReducer,
+  getFeeds,
+  getFeedSelector
+} from './feedSlice';
+import { Action } from '@reduxjs/toolkit';
+import { initialState } from './feedSlice';
 
-describe('редьюсер слайса feed', () => {
-  const initialFeedState = {
-    orders: [],
-    total: 0,
-    totalToday: 0,
-    isFeedsLoading: false
+describe('reducer feed slicce', () => {
+  const mockOrders: TOrder[] = [
+    {
+      _id: '1',
+      ingredients: [
+        '643d69a5c3f7b9001cfa093c',
+        '643d69a5c3f7b9001cfa093e',
+        '643d69a5c3f7b9001cfa093c'
+      ],
+      status: 'done',
+      name: 'Краторный люминесцентный бургер',
+      createdAt: '2024-06-14T18:14:47.162Z',
+      updatedAt: '2024-06-14T18:14:47.537Z',
+      number: 42463
+    },
+    {
+      _id: '2',
+      ingredients: [
+        '643d69a5c3f7b9001cfa093d',
+        '643d69a5c3f7b9001cfa093e',
+        '643d69a5c3f7b9001cfa093d'
+      ],
+      status: 'pending',
+      name: 'Флюоресцентный люминесцентный бургер',
+      createdAt: '2024-06-14T18:12:42.449Z',
+      updatedAt: '2024-06-14T18:12:42.920Z',
+      number: 42462
+    }
+  ];
+
+  const mockPayload = {
+    orders: mockOrders,
+    total: 50,
+    totalToday: 10
   };
 
-  test('перед загрузкой ленты', () => {
-    const action = {
-      type: 'feeds/getFeeds/pending'
-    };
-    const newState = feedSliceReducer(initialFeedState, action);
-    const { isFeedsLoading } = newState;
-    expect(isFeedsLoading).toBe(true);
+  test('initianl state', () => {
+    expect(feedSliceReducer(undefined, {} as Action)).toEqual(initialState);
   });
 
-  test('лента загрузилась', () => {
-    const expectedResult = {
-      orders: [
-        {
-          _id: '666c889797ede0001d070b96',
-          ingredients: [
-            '643d69a5c3f7b9001cfa093c',
-            '643d69a5c3f7b9001cfa093e',
-            '643d69a5c3f7b9001cfa093c'
-          ],
-          status: 'done',
-          name: 'Краторный люминесцентный бургер',
-          createdAt: '2024-06-14T18:14:47.162Z',
-          updatedAt: '2024-06-14T18:14:47.537Z',
-          number: 42463
-        },
-        {
-          _id: '666c881a97ede0001d070b93',
-          ingredients: [
-            '643d69a5c3f7b9001cfa093d',
-            '643d69a5c3f7b9001cfa093e',
-            '643d69a5c3f7b9001cfa093d'
-          ],
-          status: 'done',
-          name: 'Флюоресцентный люминесцентный бургер',
-          createdAt: '2024-06-14T18:12:42.449Z',
-          updatedAt: '2024-06-14T18:12:42.920Z',
-          number: 42462
-        },
-        {
-          _id: '666c848097ede0001d070b8d',
-          ingredients: [
-            '643d69a5c3f7b9001cfa0943',
-            '643d69a5c3f7b9001cfa0945',
-            '643d69a5c3f7b9001cfa093d'
-          ],
-          status: 'done',
-          name: 'Space флюоресцентный антарианский бургер',
-          createdAt: '2024-06-14T17:57:20.269Z',
-          updatedAt: '2024-06-14T17:57:20.658Z',
-          number: 42460
-        }
-      ],
-      total: 3,
-      totalToday: 1
-    };
+  test('get pending', () => {
+    const action = { type: getFeeds.pending.type };
+    const state = feedsReducer(initialState, action);
+    expect(state).toEqual({ ...initialState, isFeedsLoading: true });
+  });
+
+  test('get rejected', () => {
     const action = {
-      type: 'feeds/getFeeds/fulfilled',
-      payload: expectedResult
+      type: getFeeds.rejected.type
     };
-    const newState = feedSliceReducer(initialFeedState, action);
-    const { orders, total, totalToday, isFeedsLoading } = newState;
-    expect(orders).toEqual(expectedResult.orders);
-    expect(total).toBe(expectedResult.total);
-    expect(totalToday).toBe(expectedResult.totalToday);
-    expect(isFeedsLoading).toBe(false);
+    const state = feedsReducer(initialState, action);
+    expect(state).toEqual({
+      ...initialState,
+      isFeedsLoading: false
+    });
+  });
+
+  test('get fulfilled', () => {
+    const action = { type: getFeeds.fulfilled.type, payload: mockPayload };
+    const state = feedsReducer(initialState, action);
+    expect(state).toEqual({
+      ...initialState,
+      orders: mockPayload.orders,
+      total: mockPayload.total,
+      totalToday: mockPayload.totalToday,
+      isFeedsLoading: false
+    });
+  });
+
+  test('getFeedSelector should return the feed state', () => {
+    const state = {
+      feeds: {
+        orders: mockOrders,
+        total: 50,
+        totalToday: 10,
+        isFeedsLoading: false
+      }
+    };
+
+    const selectedState = getFeedSelector(state);
+    expect(selectedState).toEqual(state.feeds);
   });
 });

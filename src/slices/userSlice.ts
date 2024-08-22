@@ -11,6 +11,7 @@ import {
   updateUserApi
 } from '../utils/burger-api';
 import { TUser } from '@utils-types';
+import { RootState } from 'src/services/store';
 
 type TUserState = {
   isAuthChecked: boolean;
@@ -18,10 +19,10 @@ type TUserState = {
   isLoading: boolean;
 };
 
-const initialState: TUserState = {
-  isAuthChecked: false,
+export const initialState: TUserState = {
   user: null,
-  isLoading: false
+  isLoading: false,
+  isAuthChecked: false
 };
 
 export const userSlice = createSlice({
@@ -35,17 +36,16 @@ export const userSlice = createSlice({
       state.user = action.payload;
     }
   },
-  selectors: {
-    isAuthCheckedSelector: (state) => state.isAuthChecked,
-    userDataSelector: (state) => state.user
-  },
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
+        state.isAuthChecked = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.user = action.payload;
+        state.isAuthChecked = true;
+        state.isLoading = false;
       })
       .addCase(registerUser.rejected, (state) => {
         state.isLoading = false;
@@ -53,9 +53,12 @@ export const userSlice = createSlice({
 
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
+        state.isAuthChecked = false;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload;
+        state.isAuthChecked = true;
+        state.isLoading = false;
       })
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
@@ -63,9 +66,12 @@ export const userSlice = createSlice({
 
       .addCase(updateUser.pending, (state) => {
         state.isLoading = true;
+        state.isAuthChecked = false;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
+        state.isAuthChecked = true;
+        state.isLoading = false;
       })
       .addCase(updateUser.rejected, (state) => {
         state.isLoading = false;
@@ -76,15 +82,36 @@ export const userSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+        state.isLoading = false;
       })
       .addCase(logout.rejected, (state) => {
+        state.isLoading = false;
+      })
+
+      .addCase(forgotPassord.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(forgotPassord.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(forgotPassord.rejected, (state) => {
+        state.isLoading = false;
+      })
+
+      .addCase(checkUserAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(checkUserAuth.fulfilled, (state) => {
+        state.isAuthChecked = true;
+        state.isLoading = false;
+      })
+      .addCase(checkUserAuth.rejected, (state) => {
         state.isLoading = false;
       });
   }
 });
 
 export default userSlice.reducer;
-export const { isAuthCheckedSelector, userDataSelector } = userSlice.selectors;
 export const { authChecked, setUser } = userSlice.actions;
 
 export const registerUser = createAsyncThunk(
@@ -129,17 +156,14 @@ export const forgotPassord = createAsyncThunk(
 
 export const checkUserAuth = createAsyncThunk(
   'user/checkUser',
-  (_, { dispatch }) => {
+  async (_, { dispatch }) => {
     if (getCookie('accessToken')) {
-      getUserApi()
-        .then((data) => {
-          dispatch(setUser(data.user));
-        })
-        .finally(() => {
-          dispatch(authChecked());
-        });
-    } else {
-      dispatch(authChecked());
+      const data = await getUserApi();
+      dispatch(setUser(data.user));
     }
+    dispatch(authChecked());
   }
 );
+
+export const selectUser = (state: RootState) => state.user;
+export const userDataSelector = (state: RootState) => state.user.user;

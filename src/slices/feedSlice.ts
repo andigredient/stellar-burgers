@@ -9,14 +9,14 @@ type TFeedState = {
   isFeedsLoading: boolean;
 };
 
-const initialState: TFeedState = {
+export const initialState: TFeedState = {
   orders: [],
   total: 0,
   totalToday: 0,
   isFeedsLoading: true
 };
 
-export const getFeeds = createAsyncThunk('feeds/getFeeds', async () =>
+export const getFeeds = createAsyncThunk('feeds/all', async () =>
   getFeedsApi()
 );
 
@@ -46,3 +46,4 @@ const feedSlice = createSlice({
 
 export default feedSlice.reducer;
 export const { getFeedSelector } = feedSlice.selectors;
+export const feedsReducer = feedSlice.reducer;

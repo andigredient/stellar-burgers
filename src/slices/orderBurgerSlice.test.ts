@@ -1,59 +1,54 @@
-import orderBurgerSliceReducer from './orderBurgerSlice';
+import { describe, expect, test } from '@jest/globals';
+import orderBurgerReducer, {
+  selectOrder,
+  selectOrderName,
+  selectRequestInProgress
+} from './orderBurgerSlice';
+import { orderBurger } from './orderBurgerSlice';
+import { TOrder } from '@utils-types';
 
-describe('редьюсер слайса orderBurger', () => {
-  const initialOrderBurgerState = {
-    order: {
-      _id: '666c889797ede0001d070b96',
-      ingredients: [
-        '643d69a5c3f7b9001cfa093c',
-        '643d69a5c3f7b9001cfa093e',
-        '643d69a5c3f7b9001cfa093c'
-      ],
-      status: 'done',
-      name: 'Краторный люминесцентный бургер',
-      createdAt: '2024-06-14T18:14:47.162Z',
-      updatedAt: '2024-06-14T18:14:47.537Z',
-      number: 42463
-    },
-    name: 'Краторный люминесцентный бургер',
+describe('orderBurger reducer', () => {
+  const initialState = {
+    order: null,
+    name: '',
     orderRequest: false
   };
 
-  test('идет отправка запроса', () => {
-    const action = {
-      type: 'orders/newOrder/pending'
-    };
-    const newState = orderBurgerSliceReducer(initialOrderBurgerState, action);
-    const { order, orderRequest } = newState;
-    expect(order).toBe(null);
-    expect(orderRequest).toBe(true);
+  const mockOrder: TOrder = {
+    _id: '1',
+    ingredients: ['60d3b41abdacab0026a733c6', '60d3b41abdacab0026a733c7'],
+    status: 'done',
+    name: 'Space флюоресцентный бургер',
+    createdAt: '2021-06-27T16:33:14.667Z',
+    updatedAt: '2021-06-27T16:33:14.667Z',
+    number: 3456
+  };
+
+  test('handle pending state', () => {
+    const action = { type: orderBurger.pending.type };
+    const newState = orderBurgerReducer(initialState, action);
+    expect(newState.order).toBe(null);
+    expect(newState.orderRequest).toBe(true);
   });
 
-  test('заказ сделан', () => {
-    const expectedResult = {
-      order: {
-        _id: '666c881a97ede0001d070b93',
-        ingredients: [
-          '643d69a5c3f7b9001cfa093d',
-          '643d69a5c3f7b9001cfa093e',
-          '643d69a5c3f7b9001cfa093d'
-        ],
-        status: 'done',
-        name: 'Флюоресцентный люминесцентный бургер',
-        createdAt: '2024-06-14T18:12:42.449Z',
-        updatedAt: '2024-06-14T18:12:42.920Z',
-        number: 42462
-      },
-      name: 'Флюоресцентный люминесцентный бургер'
-    };
+  test('handle fulfilled state', () => {
     const action = {
-      type: 'orders/newOrder/fulfilled',
-      payload: expectedResult
+      type: orderBurger.fulfilled.type,
+      payload: {
+        order: mockOrder,
+        name: 'Space флюоресцентный бургер'
+      }
     };
-    const newState = orderBurgerSliceReducer(initialOrderBurgerState, action);
-    const { order, name, orderRequest } = newState;
-    expect(order).toEqual(expectedResult.order);
-    expect(name).toBe(expectedResult.name);
-    expect(orderRequest).toBe(false);
+    const newState = orderBurgerReducer(initialState, action);
+    expect(newState.order).toEqual(mockOrder);
+    expect(newState.name).toBe('Space флюоресцентный бургер');
+    expect(newState.orderRequest).toBe(false);
+  });
+
+  test('handle rejected state', () => {
+    const action = { type: orderBurger.rejected.type };
+    const newState = orderBurgerReducer(initialState, action);
+    expect(newState.order).toBe(null);
+    expect(newState.orderRequest).toBe(false);
   });
 });

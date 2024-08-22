@@ -7,7 +7,7 @@ type TOrderState = {
   isLoading: boolean;
 };
 
-const initialState: TOrderState = {
+export const initialState: TOrderState = {
   order: [],
   isLoading: false
 };
@@ -30,8 +30,9 @@ const ordersSlice = createSlice({
       })
       .addCase(getOrders.fulfilled, (state, action) => {
         state.order = action.payload;
+        state.isLoading = false;
       })
-      .addCase(getOrders.rejected, (state, action) => {
+      .addCase(getOrders.rejected, (state) => {
         state.isLoading = false;
       });
   }

@@ -23,10 +23,6 @@ const orderBurgerSlice = createSlice({
   name: 'orderBurger',
   initialState,
   reducers: {},
-  selectors: {
-    getBurgerSelector: (state) => state,
-    getRequestSelector: (state) => state.orderRequest
-  },
   extraReducers: (builder) => {
     builder
       .addCase(orderBurger.pending, (state) => {
@@ -45,5 +41,9 @@ const orderBurgerSlice = createSlice({
 });
 
 export default orderBurgerSlice.reducer;
-export const { getBurgerSelector, getRequestSelector } =
-  orderBurgerSlice.selectors;
+export const selectOrder = (state: { orderBurger: TNewOrderState }) =>
+  state.orderBurger.order;
+export const selectRequestInProgress = (state: {
+  orderBurger: TNewOrderState;
+}) => state.orderBurger.orderRequest;
+export const selectOrderName = (state: TNewOrderState) => state.name;

@@ -9,7 +9,7 @@ import { Profile } from '@pages';
 import { ProfileOrders } from '@pages';
 
 import { ProtectedRoute } from '../protectedRoute/protectedRoute';
-import { getOrderNumberSelector } from '../../slices/orderInfoSlice';
+import { selectOrderNumber } from '../../slices/orderInfoSlice';
 
 import '../../index.css';
 import styles from './app.module.css';
@@ -32,7 +32,7 @@ const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const backgroundLocation = location.state?.background;
-  const orderNumber = useSelector(getOrderNumberSelector);
+  const orderNumber = useSelector(selectOrderNumber);
 
   const onModalClose = () => {
     navigate(-1);

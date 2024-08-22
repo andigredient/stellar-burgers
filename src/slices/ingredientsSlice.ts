@@ -1,12 +1,7 @@
 import { getIngredientsApi } from '../utils/burger-api';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { RootState } from '../services/store';
-
 import { TIngredient } from '@utils-types';
-import type { PayloadAction } from '@reduxjs/toolkit';
-
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { RootState } from 'src/services/store';
 
 type TIngredientsState = {
   ingredients: TIngredient[];
@@ -19,7 +14,7 @@ const initialState: TIngredientsState = {
 };
 
 export const fetchIngredients = createAsyncThunk(
-  `ingredients/fetchIngredients`,
+  'ingredients/fetchIngredients',
   async () => getIngredientsApi()
 );
 
@@ -27,13 +22,6 @@ const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,
   reducers: {},
-  selectors: {
-    getIngredientSelector: (sliceState) => sliceState.ingredients,
-    selectisIngredientsLoading: (sliceState) => sliceState.isIngredientsLoading,
-    getSelectIngredientId: (state, payload) =>
-      state.ingredients.find((i) => i._id === payload.id)
-  },
-
   extraReducers: (builder) => {
     builder
       .addCase(fetchIngredients.pending, (state) => {
@@ -49,9 +37,12 @@ const ingredientsSlice = createSlice({
   }
 });
 
-export const {
-  getIngredientSelector,
-  selectisIngredientsLoading,
-  getSelectIngredientId
-} = ingredientsSlice.selectors;
+export const getIngredientSelector = (state: RootState): TIngredient[] =>
+  state.ingredients.ingredients;
+export const selectIsIngredientsLoading = (state: {
+  ingredients: TIngredientsState;
+}) => state.ingredients.isIngredientsLoading;
+export const getSelectIngredientId = (state: RootState, id?: string) =>
+  id ? state.ingredients.ingredients.find((i) => i._id === id) : undefined;
+
 export default ingredientsSlice.reducer;

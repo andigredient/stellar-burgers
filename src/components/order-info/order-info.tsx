@@ -3,19 +3,15 @@ import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
 import { useParams } from 'react-router-dom';
-import { getOrderByNumber } from '../../slices/orderInfoSlice';
+import { getOrderByNumber, selectOrder } from '../../slices/orderInfoSlice';
 import { useDispatch, useSelector } from '../../services/store';
 import { getIngredientSelector } from '../../slices/ingredientsSlice';
-import {
-  getOrderSelector,
-  getOrderNumberSelector
-} from '../../slices/orderInfoSlice';
 
 export const OrderInfo: FC = () => {
   /** TODO: взять переменные orderData и ingredients из стора */
   const params = useParams();
   const dispatch = useDispatch();
-  const orderData = useSelector(getOrderSelector);
+  const orderData = useSelector(selectOrder);
   const ingredients = useSelector(getIngredientSelector);
 
   /* Готовим данные для отображения */

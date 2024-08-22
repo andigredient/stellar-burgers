@@ -1,51 +1,75 @@
-import orderInfoSliceReducer from './orderInfoSlice';
+import { describe, expect, test } from '@jest/globals';
+import orderReducer, {
+  selectOrder,
+  selectOrderNumber,
+  getOrderByNumber
+} from './orderInfoSlice';
+import { TOrder } from '../utils/types';
 
-describe('редьюсер слайса orderInfo', () => {
-  const initialOrderInfoState = {
-    order: {
-      _id: '666c889797ede0001d070b96',
-      ingredients: [
-        '643d69a5c3f7b9001cfa093c',
-        '643d69a5c3f7b9001cfa093e',
-        '643d69a5c3f7b9001cfa093c'
-      ],
-      status: 'done',
-      name: 'Краторный люминесцентный бургер',
-      createdAt: '2024-06-14T18:14:47.162Z',
-      updatedAt: '2024-06-14T18:14:47.537Z',
-      number: 42463
-    }
+describe('orderInfo reducer', () => {
+  const initialState = {
+    order: null
   };
 
-  test('идет отправка запроса', () => {
-    const action = {
-      type: 'getOrderInfo/pending'
-    };
-    const newState = orderInfoSliceReducer(initialOrderInfoState, action);
-    const { order } = newState;
-    expect(order).toBe(null);
+  const mockOrder: TOrder = {
+    _id: '1',
+    ingredients: ['60d3b41abdacab0026a733c6', '60d3b41abdacab0026a733c7'],
+    status: 'done',
+    name: 'Space флюоресцентный бургер',
+    createdAt: '2021-06-27T16:33:14.667Z',
+    updatedAt: '2021-06-27T16:33:14.667Z',
+    number: 3456
+  };
+
+  test('pending state', () => {
+    const action = { type: getOrderByNumber.pending.type };
+    const newState = orderReducer(initialState, action);
+    expect(newState.order).toBe(null);
   });
 
-  test('получены данные о заказе', () => {
-    const expectedResult = {
-        _id: '666c881a97ede0001d070b93',
-        ingredients: [
-          '643d69a5c3f7b9001cfa093d',
-          '643d69a5c3f7b9001cfa093e',
-          '643d69a5c3f7b9001cfa093d'
-        ],
-        status: 'done',
-        name: 'Флюоресцентный люминесцентный бургер',
-        createdAt: '2024-06-14T18:12:42.449Z',
-        updatedAt: '2024-06-14T18:12:42.920Z',
-        number: 42462
-    };
+  test('fulfilled state', () => {
     const action = {
-      type: 'getOrderInfo/fulfilled',
-      payload: {orders: [expectedResult]}
+      type: getOrderByNumber.fulfilled.type,
+      payload: { orders: [mockOrder] }
     };
-    const newState = orderInfoSliceReducer(initialOrderInfoState, action);
-    const { order } = newState;
-    expect(order).toEqual(expectedResult);
+    const newState = orderReducer(initialState, action);
+    expect(newState.order).toEqual(mockOrder);
+  });
+
+  test('fulfilled emtpy', () => {
+    const action = {
+      type: getOrderByNumber.fulfilled.type,
+      payload: { orders: [] }
+    };
+    const newState = orderReducer(initialState, action);
+    expect(newState.order).toBe(null);
+  });
+
+  test('rejected state', () => {
+    const action = { type: getOrderByNumber.rejected.type };
+    const newState = orderReducer(initialState, action);
+    expect(newState.order).toBe(null);
+  });
+
+  test('selectors', () => {
+    const state = {
+      orderInfo: {
+        order: mockOrder
+      }
+    };
+
+    expect(selectOrder(state)).toEqual(mockOrder);
+    expect(selectOrderNumber(state)).toBe(mockOrder.number);
+  });
+
+  test('handle null order', () => {
+    const state = {
+      orderInfo: {
+        order: null
+      }
+    };
+
+    expect(selectOrder(state)).toBe(null);
+    expect(selectOrderNumber(state)).toBeUndefined();
   });
 });

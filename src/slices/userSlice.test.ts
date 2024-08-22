@@ -1,79 +1,180 @@
-import userReducer, { authChecked, setUser } from './userSlice';
+import { describe, expect, test } from '@jest/globals';
+import userReducer, {
+  initialState,
+  logout,
+  getUser,
+  updateUser,
+  registerUser,
+  loginUser,
+  forgotPassord,
+  checkUserAuth,
+  authChecked,
+  setUser
+} from './userSlice';
+import { TUser } from '@utils-types';
+import { Action } from '@reduxjs/toolkit';
 
-describe('редьюсер слайса user', () => {
-  const initialState = {
-    isAuthChecked: false,
-    user: null,
-    isLoading: false
+describe('userSlice test', () => {
+  const mockUser: TUser = {
+    email: 'test@test.ru',
+    name: 'test'
   };
 
-  test('проверка аутентификации', () => {
-    const newState = userReducer(initialState, authChecked());
-    const { isAuthChecked } = newState;
-    expect(isAuthChecked).toBe(true);
+  test('initial state', () => {
+    expect(userReducer(undefined, {} as Action)).toEqual(initialState);
   });
 
-  test('установка пользователя', () => {
-    const expectedResult = {
-      name: 'Name',
-      email: 'example@mail.ru'
-    };
-    const newState = userReducer(
-        initialState,
-      setUser(expectedResult)
-    );
-    const { user } = newState;
-    expect(user).toEqual(expectedResult);
+  test('registerUser pending', () => {
+    const action = { type: registerUser.pending.type };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(true);
+    expect(state.isAuthChecked).toBe(false);
   });
 
-  test('регистрация пользователя', () => {
-    const expectedResult = {
-      name: 'Name',
-      email: 'example@mail.ru'
-    };
+  test('registerUser fulfilled', () => {
     const action = {
-      type: 'user/registerUser/fulfilled',
-      payload: expectedResult
+      type: registerUser.fulfilled.type,
+      payload: mockUser
     };
-    const newState = userReducer(initialState, action);
-    const { user } = newState;
-    expect(user).toEqual(expectedResult);
+    const state = userReducer(initialState, action);
+    expect(state.user).toEqual(mockUser);
+    expect(state.isAuthChecked).toBe(true);
+    expect(state.isLoading).toBe(false);
   });
 
-  test('вход пользователя', () => {
-    const expectedResult = {
-      name: 'Name',
-      email: 'example@mail.ru'
-    };
+  test('registerUser rejected', () => {
     const action = {
-      type: 'user/loginUser/fulfilled',
-      payload: expectedResult
+      type: registerUser.rejected.type,
+      error: { message: 'Ошибка регистрации' }
     };
-    const newState = userReducer(initialState, action);
-    const { user } = newState;
-    expect(user).toEqual(expectedResult);
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(false);
   });
 
-  test('обновление данных пользователя', () => {
-    const expectedResult = {
-      name: 'Name',
-      email: 'example@mail.ru'
-    };
-    const action = {
-      type: 'user/updateUser/fulfilled',
-      payload: { user: expectedResult, success: true }
-    };
-    const newState = userReducer(initialState, action);
-    const { user } = newState;
-    expect(user).toEqual(expectedResult);
+  test('loginUser pending', () => {
+    const action = { type: loginUser.pending.type };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(true);
+    expect(state.isAuthChecked).toBe(false);
   });
 
-  test('выход пользователя', () => {
+  test('loginUser fulfilled', () => {
     const action = {
-      type: 'user/logout/fulfilled'
+      type: loginUser.fulfilled.type,
+      payload: mockUser
     };
-    const newState = userReducer(initialState, action);
-    const { user } = newState;
-    expect(user).toBe(null);
+    const state = userReducer(initialState, action);
+    expect(state.user).toEqual(mockUser);
+    expect(state.isAuthChecked).toBe(true);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('loginUser rejected', () => {
+    const action = {
+      type: loginUser.rejected.type,
+      error: { message: 'Ошибка авторизации' }
+    };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('updateUser pending', () => {
+    const action = { type: updateUser.pending.type };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(true);
+    expect(state.isAuthChecked).toBe(false);
+  });
+
+  test('updateUser fulfilled', () => {
+    const action = {
+      type: updateUser.fulfilled.type,
+      payload: { user: mockUser }
+    };
+    const state = userReducer(initialState, action);
+    expect(state.user).toEqual(mockUser);
+    expect(state.isAuthChecked).toBe(true);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('updateUser rejected', () => {
+    const action = {
+      type: updateUser.rejected.type,
+      error: { message: 'Ошибка обновления пользователя' }
+    };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('logout pending', () => {
+    const action = { type: logout.pending.type };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(true);
+  });
+
+  test('logout fulfilled', () => {
+    const action = { type: logout.fulfilled.type };
+    const state = userReducer({ ...initialState, user: mockUser }, action);
+    expect(state.user).toBeNull();
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('logout rejected', () => {
+    const action = {
+      type: logout.rejected.type,
+      error: { message: 'Ошибка выхода' }
+    };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('forgotPassord pending', () => {
+    const action = { type: forgotPassord.pending.type };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(true);
+  });
+
+  test('forgotPassord fulfilled', () => {
+    const action = { type: forgotPassord.fulfilled.type };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('forgotPassord rejected', () => {
+    const action = {
+      type: forgotPassord.rejected.type,
+      error: { message: 'Ошибка сброса пароля' }
+    };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('checkUserAuth pending', () => {
+    const action = { type: checkUserAuth.pending.type };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(true);
+  });
+
+  test('checkUserAuth rejected', () => {
+    const action = {
+      type: checkUserAuth.rejected.type,
+      error: { message: 'Ошибка проверки аутентификации' }
+    };
+    const state = userReducer(initialState, action);
+    expect(state.isLoading).toBe(false);
+  });
+
+  test('authChecked action', () => {
+    const action = { type: authChecked.type };
+    const state = userReducer(initialState, action);
+    expect(state.isAuthChecked).toBe(true);
+  });
+
+  test('setUser action', () => {
+    const action = {
+      type: setUser.type,
+      payload: mockUser
+    };
+    const state = userReducer(initialState, action);
+    expect(state.user).toEqual(mockUser);
   });
 });
